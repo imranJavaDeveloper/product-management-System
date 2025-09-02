@@ -2,8 +2,8 @@
 
 Project Details
 * Project Name: Product Management System
-* Date: Mention start and end date of the project
-* Project URL (Optional): Add a GitHub link if the code is hosted online
+* Date: 12/08/2025 start and end 03/09/2025 of the project
+* Project URL (Optional): https://github.com/imranJavaDeveloper/product-management-System
 
 * **Project Description:**
 
