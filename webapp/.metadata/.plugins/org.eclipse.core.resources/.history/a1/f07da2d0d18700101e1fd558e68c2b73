@@ -1,0 +1,87 @@
+package com.cetpa.controllers;
+
+import java.time.LocalDate;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import com.cetpa.models.User;
+import com.cetpa.repositories.AccountRepository;
+import com.cetpa.services.UserService;
+
+import jakarta.servlet.http.HttpSession;
+
+
+
+@Controller
+@RequestMapping("user")
+public class UserController 
+{
+	//Dependency injection
+	@Autowired private AccountRepository accountRepository;
+	private UserService userService;
+	public UserController(UserService userService) 
+	{
+		this.userService = userService;
+	}
+	
+	@GetMapping("/registration")
+	public String getRegistrationForm(Model model)
+	{
+		model.addAttribute("maxDob", LocalDate.now().minusYears(18));
+        model.addAttribute("minDob", LocalDate.now().minusYears(100));
+		return "user/registration/registration-form";
+	}
+	@PostMapping("/register-user")
+	public ModelAndView registerUser(User user)
+	{
+		ModelAndView model=new ModelAndView("user/registration/registration-success");
+		model.addObject("username",user.getFirstname()+" "+user.getLastname());
+		if(userService.userExists(user.getUserid()))
+			model.setViewName("user/registration/registration-fail");
+		else
+		{
+			int accountno=userService.createUser(user);
+			model.addObject("accountno",accountno);
+		}
+		return model;
+	}
+	@PostMapping("/authenticate-user")
+	public ModelAndView authenticateUser(String userid,String password,HttpSession ses)
+	{
+		ModelAndView model=new ModelAndView();
+		User user=userService.getUser(userid);
+		if(user==null)
+		{
+			model.addObject("uid",userid);
+			model.addObject("msg","Entered userid does not exist");
+			model.setViewName("user/login/login-form");
+			return model;
+		}
+		System.out.println("form pass:"+password);
+		System.out.println("db pass:"+user.getPassword());
+		if(!password.equals(user.getPassword()))
+		{
+			model.addObject("uid",userid);
+			model.addObject("msg","Entered password is wrong");
+			model.setViewName("user/login/login-form");
+			return model;
+		}
+		ses.setAttribute("username",user.getFirstname()+" "+user.getLastname());
+		final int accountno=accountRepository.getAccountNo(userid);
+		ses.setAttribute("accountno",accountno);
+		model.setViewName("redirect:/");
+		return model;
+	}
+	@GetMapping("/logout.do")
+	public String logoutSuccess(HttpSession ses,Model model)
+	{
+		model.addAttribute("username",ses.getAttribute("username"));
+		ses.invalidate();
+		return "user/login/logout-success";
+	}
+}

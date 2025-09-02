@@ -1,0 +1,58 @@
+package com.cetpa.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.cetpa.entity.Transaction;
+import com.cetpa.service.AccountService;
+
+import jakarta.servlet.http.HttpSession;
+
+@Controller
+@RequestMapping("mybank/user/transaction")
+public class TransactionController 
+{
+	@Autowired private AccountService accountService;
+	
+	@GetMapping("view-balance")
+	public String getBalanceView(Model model,HttpSession session)
+	{
+		int amount=accountService.getBalance((Integer)session.getAttribute("accountno"));
+		model.addAttribute("amount",amount);
+		return "transaction/show-balance";
+	}
+	@GetMapping("deposit-form")
+	public String getDepositFormView()
+	{
+		return "transaction/deposit/deposit-money";
+	}
+	@GetMapping("deposit-amount")
+	public String depositAmount(int amount,HttpSession session,Model model)
+	{
+		Transaction tr=accountService.depositMoney(amount,(Integer)session.getAttribute("accountno"));
+		model.addAttribute("transaction",tr);
+		return "transaction/deposit/deposit-success";
+	}
+	@GetMapping("withdraw-form")
+	public String getWithdrawFormView()
+	{
+		return "transaction/withdraw/withdraw-money";
+	}
+	@GetMapping("withdraw-amount")
+	public String withdrawAmount(int amount,HttpSession session,Model model)
+	{
+		int bamount=accountService.getBalance((Integer)session.getAttribute("accountno"));
+		if(amount>bamount)
+		{
+			model.addAttribute("msg","Sorry!!! You do not have sufficient amount");
+			model.addAttribute("amount",amount);
+			return "transaction/withdraw/withdraw-money";	
+		}
+		Transaction tr=accountService.withdrawMoney(amount,(Integer)session.getAttribute("accountno"));
+		model.addAttribute("transaction",tr);
+		return "transaction/withdraw/withdraw-success";
+	}
+}

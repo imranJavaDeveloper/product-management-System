@@ -1,0 +1,14 @@
+package com.cetpa.repository;
+
+import java.util.List;
+
+import com.cetpa.model.Product;
+
+public interface ProductRepository 
+{
+	void persistRecord(Product product);
+	List<Product> getProductList();
+	Product getRecord(int pid);
+	void deleteRecord(Product product);
+	void updateRecord(Product productn, Product producto);
+}

@@ -1,0 +1,12 @@
+package com.cetpa;
+
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class BB 
+{
+	public BB()
+	{
+		System.out.println("Object of class BB is created.");
+	}
+}

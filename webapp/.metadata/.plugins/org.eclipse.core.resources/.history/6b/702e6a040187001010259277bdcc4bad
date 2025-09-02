@@ -1,0 +1,31 @@
+package com.cetpa;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+public class DemoController 
+{
+	/*@RequestMapping("/show-record")
+	public String getProductDetails(Model model)
+	{
+		model.addAttribute("pid",101);
+		model.addAttribute("name","Laptop");
+		model.addAttribute("brand","Dell");
+		model.addAttribute("price",56000);
+		return "show-details";
+	}*/
+	// http://localhost:8080/springmvc-demo/show-record
+	@RequestMapping("/show-record")
+	public ModelAndView getProductDetails()
+	{
+		ModelAndView model=new ModelAndView("show-details");
+		model.addObject("pid",101);
+		model.addObject("name","Laptop");
+		model.addObject("brand","HP");
+		model.addObject("price",78000);
+		return model;
+	}
+}

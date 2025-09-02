@@ -1,0 +1,47 @@
+package com.cetpa.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cetpa.model.Product;
+import com.cetpa.repository.ProductRepository;
+
+@Service
+public class ProductServiceImpl implements ProductService 
+{
+	private ProductRepository productRepository;
+	
+	@Autowired
+	public void setProductRepository(ProductRepository productRepository) 
+	{
+		this.productRepository = productRepository;
+	}
+
+	public void saveProduct(Product product) 
+	{
+		productRepository.save(product);
+	}
+
+	public List<Product> getList() 
+	{
+		return productRepository.findAll();
+	}
+
+	public Product getProduct(int pid) 
+	{
+		return productRepository.findById(pid).orElse(null);
+	}
+
+	public void deleteProduct(int pid) 
+	{
+		productRepository.deleteById(pid);
+	}
+
+	public void updateProduct(Product productn) 
+	{
+		productRepository.save(productn);
+	}
+
+}

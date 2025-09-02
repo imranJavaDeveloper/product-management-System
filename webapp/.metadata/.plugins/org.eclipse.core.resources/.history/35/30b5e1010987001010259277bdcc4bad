@@ -1,0 +1,14 @@
+package com.product.service;
+
+import java.util.List;
+
+import com.product.model.Product;
+
+public interface ProductService 
+{
+	void saveProduct(Product product);
+	List<Product> getList();
+	Product getProduct(int pid);
+	void deleteProduct(int pid);
+	void updateProduct(Product product);
+}

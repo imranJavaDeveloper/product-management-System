@@ -1,0 +1,33 @@
+package com.cetpa.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cetpa.entity.AccountInfo;
+import com.cetpa.entity.UserInfo;
+import com.cetpa.repository.AccountRepository;
+import com.cetpa.repository.UserRepository;
+import com.cetpa.service.UserService;
+
+@Service
+public class UserServiceImpl implements UserService 
+{
+	@Autowired private UserRepository userRepository;
+	@Autowired private AccountRepository accountRepository;
+
+	public int registerUser(UserInfo user) 
+	{
+		//Persisting UserInfo object
+		userRepository.save(user);
+		//Persisting AccountInfo object
+		AccountInfo account=new AccountInfo();
+		account.setUserid(user.getUserid());
+		accountRepository.save(account);
+		return account.getAccountno();
+	}
+
+	public UserInfo getUser(String userid) 
+	{
+		return userRepository.findById(userid).orElse(null);
+	}
+}

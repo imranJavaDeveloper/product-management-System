@@ -1,0 +1,59 @@
+package com.cetpa.service.impl;
+
+import java.time.LocalDate;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cetpa.entity.Transaction;
+import com.cetpa.repository.AccountRepository;
+import com.cetpa.repository.TransactionRepository;
+import com.cetpa.service.AccountService;
+import com.cetpa.utility.TimeDateUtility;
+
+@Service
+public class AccountServiceImpl implements AccountService 
+{
+	@Autowired private TransactionRepository transactionRepository;
+	private AccountRepository accountRepository;
+
+	public AccountServiceImpl(AccountRepository accountRepository) 
+	{
+		this.accountRepository = accountRepository;
+	}
+	public int getBalance(Integer accountno) 
+	{
+		return accountRepository.getAmount(accountno);
+	}
+	public Transaction depositMoney(int amount, Integer accountno) 
+	{
+		//Update amount in AccountInfo entity
+		accountRepository.updateAmount(amount,accountno);
+		//Persisting object of Transaction class
+		Transaction tr=new Transaction();
+		tr.setFromAccount(accountno);
+		tr.setAmount(amount);
+		tr.setDate(TimeDateUtility.getCurrentDate());
+		tr.setTime(TimeDateUtility.getCurrentTime());
+		tr.setType("Credit");
+		tr.setToAccount(accountno);
+		transactionRepository.save(tr);
+		return tr;
+	}
+	public Transaction withdrawMoney(int amount, Integer accountno) 
+	{
+		//Update amount in AccountInfo entity
+		accountRepository.updateAmount(-amount,accountno);
+		//Persisting object of Transaction class
+		Transaction tr=new Transaction();
+		tr.setFromAccount(accountno);
+		tr.setAmount(amount);
+		tr.setDate(TimeDateUtility.getCurrentDate());
+		tr.setTime(TimeDateUtility.getCurrentTime());
+		tr.setType("Debit");
+		tr.setToAccount(accountno);
+		transactionRepository.save(tr);
+		return tr;
+	}
+	
+}

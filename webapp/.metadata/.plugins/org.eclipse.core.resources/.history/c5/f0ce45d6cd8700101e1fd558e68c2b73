@@ -1,0 +1,88 @@
+package com.cetpa.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.cetpa.entity.UserInfo;
+import com.cetpa.repository.AccountRepository;
+import com.cetpa.service.UserService;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+@Controller
+@RequestMapping("mybank/user")
+public class UserController 
+{
+	@Autowired private UserService userService;
+	@Autowired private AccountRepository accountRepository;
+	
+	@GetMapping("login")
+	public String getLoginFormView(HttpSession session)
+	{
+		if(session.getAttribute("username")!=null)
+			return "redirect:/mybank";
+		return "login/user-login";
+	}
+	@PostMapping("authenticate-user")
+	public String authenticateUser(HttpSession session,String userid,String password,Model model,HttpServletRequest request,HttpServletResponse response)
+	{
+		UserInfo user=userService.getUser(userid); 
+		if(user==null)
+		{
+			model.addAttribute("msg","Entered userid does not exist");
+			model.addAttribute("uid",userid);
+			return "login/user-login";
+		}
+		String dpassword=user.getPassword();
+		if(!password.equals(dpassword))
+		{
+			model.addAttribute("msg","Entered password is wrong");
+			model.addAttribute("uid",userid);
+			return "login/user-login";
+		}
+		//session.setMaxInactiveInterval(10);
+		Cookie []cookies=request.getCookies();
+		for(Cookie cookie:cookies)
+		{
+			if(cookie.getName().equals("JSESSIONID"))
+			{
+				cookie.setMaxAge(60);
+				cookie.setPath("/");
+				response.addCookie(cookie);
+			}
+		}
+		session.setAttribute("username",user.getName());
+		int accountno=accountRepository.getAccountNoByUserId(userid);
+		session.setAttribute("accountno",accountno);
+		return "redirect:/mybank";
+	}
+	@GetMapping("registration-view")
+	public String getRegistrationFormView()
+	{
+		return "login/user-registration";
+	}
+	@PostMapping("registerme")
+	public String createUserAccount(UserInfo user,Model model)
+	{
+		int accountno=userService.registerUser(user);
+		model.addAttribute("accountno",accountno);
+		model.addAttribute("name",user.getName());
+		return "login/registration-success";
+	}
+	@GetMapping("logout")
+	public String getLogoutView(HttpSession session,Model model)
+	{
+		if(session.getAttribute("username")==null)
+			return "redirect:/mybank";
+		model.addAttribute("username",session.getAttribute("username"));
+		session.invalidate();
+		return "login/logout";
+	}
+}

@@ -1,0 +1,109 @@
+package com.cetpa.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import com.cetpa.model.Product;
+import com.cetpa.service.ProductService;
+
+@Controller
+public class ProductController 
+{
+	@Autowired ProductService productService;
+	
+	@GetMapping("/insert-view")
+	public String getInsertForm()
+	{
+		return "insert-form";
+	}
+	@PostMapping("/save-record")
+	public String saveProductRecord(Product product)
+	{
+		productService.saveProduct(product);
+		return "save-success";
+	}
+	
+	@GetMapping("/products-view")
+	public ModelAndView getProductList()
+	{
+		List<Product> productList=productService.getList();
+		ModelAndView model=new ModelAndView();
+		model.setViewName("product-list");
+		model.addObject("plist",productList);
+		return model;
+	}
+	
+	@GetMapping("/search-view")
+	public String getSearchView()
+	{
+		return "search-form";
+	}
+	@GetMapping("/show-record")
+	public String getProductRecord(int pid,Model model)
+	{
+		Product product=productService.getProduct(pid);
+		if(product==null)
+		{
+			model.addAttribute("msg","Product record not found.");
+			model.addAttribute("pid",pid);
+			return "search-form";
+		}
+		model.addAttribute("product",product);
+		return "show-record";
+	}
+	
+	@GetMapping("/delete-view")
+	public String getDeleteView()
+	{
+		return "delete-form";
+	}
+	@GetMapping("/confirm-delete")
+	public String getProductToDelete(int pid,Model model)
+	{
+		Product product=productService.getProduct(pid);
+		if(product==null)
+		{
+			model.addAttribute("msg","Product record does not exist.");
+			model.addAttribute("pid",pid);
+			return "delete-form";
+		}
+		model.addAttribute("product",product);
+		return "confirm-delete-form";
+	}
+	@GetMapping("/delete-record")
+	public String deleteProductRecord(int pid,Model model)
+	{
+		productService.deleteProduct(pid);
+		model.addAttribute("pid", pid);
+		return "delete-success";
+	}
+	
+	@GetMapping("/edit-view")
+	public String getEditView()
+	{
+		return "edit-form";
+	}
+	@GetMapping("/show-edit-record")
+	public String getProductToEdit(int pid,Model model)
+	{
+		Product product=productService.getProduct(pid);
+		if(product==null)
+		{
+			model.addAttribute("msg","Product record does not exist.");
+			model.addAttribute("pid",pid);
+			return "edit-form";
+		}
+		model.addAttribute("product",product);
+		return "show-edit-record";
+	}
+	@PostMapping("/update-record")
+	public String updateProductRecord(Product product,Model model)
+	{
+		productService.updateProduct(product);
+		model.addAttribute("pid",product.getPid());
+		return "update-success";
+	}
+}

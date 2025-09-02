@@ -1,0 +1,12 @@
+package org.cetpa;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class AA 
+{
+	public AA()
+	{
+		System.out.println("Object of class AA is created.");
+	}
+}

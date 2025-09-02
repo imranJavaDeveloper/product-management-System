@@ -1,0 +1,10 @@
+package com.cetpa.service;
+
+import com.cetpa.entity.Transaction;
+
+public interface AccountService 
+{
+	int getBalance(Integer accountno);
+	Transaction depositMoney(int amount, Integer accountno);
+	Transaction withdrawMoney(int amount, Integer accountno);
+}
